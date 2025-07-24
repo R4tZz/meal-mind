@@ -1,0 +1,84 @@
+title,body,labels,status
+"Initialize Nx Workspace",
+"Create the basic Nx monorepo structure.
+- **Acceptance Criteria:**
+  - An Nx monorepo workspace named **mealmind** is created at the root level.
+  - The workspace uses your preferred package manager (npm, yarn, pnpm).",
+"phase-1,setup",Backlog
+
+"Setup Supabase Local Stack",
+"Get Docker Desktop and supabase CLI running, and initialize the local Supabase instance.
+- **Acceptance Criteria:**
+  - Docker Desktop (or equivalent) is installed and running.
+  - The Supabase CLI is installed (**npm install supabase --save-dev** or **brew install supabase/supabase/supabase**).
+  - Inside the Nx workspace root, a **supabase** directory is initialized (**npx supabase init**).
+  - The local Supabase stack (including PostgreSQL, Auth, PostgREST) can be started successfully using **npx supabase start**.
+  - You can access Supabase Studio locally (usually **http://localhost:54323**).
+  - You have confirmed local database credentials for the Supabase Postgres instance.",
+"phase-1,supabase",Backlog
+
+"Dockerize FastAPI Backend",
+"Create the Dockerfile for the FastAPI backend application and configure it.
+- **Acceptance Criteria:**
+  - A **Dockerfile** is created for the FastAPI application within its Nx project directory (e.g., **apps/api/Dockerfile**).
+  - The **Dockerfile** uses a Python base image, installs **uv** within the container, and uses **uv** to manage dependencies (e.g., **RUN uv sync --frozen**).
+  - A **pyproject.toml** and **uv.lock** file are generated for the FastAPI project to define and lock dependencies using **uv**.",
+"phase-1,backend",Backlog
+
+"Dockerize SvelteKit Frontend",
+"Create the Dockerfile for the SvelteKit frontend application and configure it.
+- **Acceptance Criteria:**
+  - A **Dockerfile** is created for the SvelteKit application within its Nx project directory (e.g., **apps/frontend/Dockerfile**).
+  - The **Dockerfile** uses a Node.js base image and is set up for a multi-stage build.
+  - SvelteKit is configured to use **@sveltejs/adapter-node** for server-side rendering.
+  - Tailwind CSS and **shadcn/svelte** are correctly configured within the SvelteKit project.",
+"phase-1,frontend",Backlog
+
+"Configure Docker Compose for Monorepo",
+"Create the root **docker-compose.yml** file to orchestrate all services.
+- **Acceptance Criteria:**
+  - A **docker-compose.yml** file is created at the root of the Nx workspace that orchestrates:
+    - Your local Supabase services.
+    - Your FastAPI backend application container.
+    - Your SvelteKit frontend application container.
+  - All containers can be brought up and shut down together using **docker compose up -d** and **docker compose down**.
+  - Network configuration ensures inter-container communication via service names.",
+"phase-1,docker",Backlog
+
+"Setup uv for Backend (Host)",
+"Install uv globally on your host machine for local Python package management.
+- **Acceptance Criteria:**
+  - **uv** is installed globally on your host machine (**curl -LsSf https://astral.sh/uv/install.sh | sh** or **pip install uv**).",
+"phase-1,python",Backlog
+
+"Install Testing Tools (Backend)",
+"Install **pytest** and **httpx** as development dependencies for the backend project.
+- **Acceptance Criteria:**
+  - **pytest** and **httpx** are installed as dev dependencies for the backend project.
+  - A minimal **pytest** configuration (e.g., **pytest.ini**) is present.",
+"phase-1,testing",Backlog
+
+"Install Testing Tools (Frontend)",
+"Install **Vitest** and **Playwright** as development dependencies for the frontend project.
+- **Acceptance Criteria:**
+  - **Vitest** and **Playwright** are installed as dev dependencies for the frontend project.
+  - Initial configurations for both are present.",
+"phase-1,testing",Backlog
+
+"Verify Initial Communication",
+"Test that the frontend, backend, and database containers can communicate.
+- **Acceptance Criteria:**
+  - The FastAPI application is configured to connect to the local Supabase PostgreSQL container using environment variables.
+  - You can verify that the frontend container can successfully make a simple HTTP request to the backend container.
+  - The backend container can successfully connect to the local Supabase PostgreSQL database.
+  - Run a simple **nx test frontend** and **nx test api** command, confirming that the test runners execute (even if no meaningful tests are written yet beyond setup confirmation).",
+"phase-1,testing",Backlog
+
+"Set up Local Dev Environment",
+"Ensure all necessary tools are installed locally on your development machine.
+- **Acceptance Criteria:**
+  - Python (3.9+) and Node.js (LTS) are installed locally.
+  - Nx CLI is installed globally or used via **npx**.
+  - Your IDE (VS Code recommended) has relevant extensions for Svelte, Python, Tailwind CSS, Nx Console, and Docker.
+  - **.env** files (or similar environment variable management) are correctly set up to pass necessary variables (e.g., database connection strings) to both containers and local development processes.",
+"phase-1,setup",Backlog
