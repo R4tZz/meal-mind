@@ -2,9 +2,13 @@
   "name": "mealmind",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:status": "supabase status",
+    "supabase:reset": "supabase db reset"
+  },
   "private": true,
-  "dependencies": {},
   "devDependencies": {
     "@nx/js": "21.3.5",
     "@swc-node/register": "~1.9.1",
@@ -12,6 +16,7 @@
     "@swc/helpers": "~0.5.11",
     "nx": "21.3.5",
     "prettier": "^2.6.2",
+    "supabase": "^2.31.8",
     "tslib": "^2.3.0",
     "typescript": "~5.8.2"
   },
