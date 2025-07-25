@@ -11,4 +11,3 @@ __pycache__
 .DS_Store
 Dockerfile.pip
 requirements.txt
-README.md
