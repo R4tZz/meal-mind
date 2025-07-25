@@ -5,7 +5,7 @@ FROM python:3.12-slim
 WORKDIR /app
 
 # Install uv
-RUN pip install uv
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Copy project files
 COPY pyproject.toml uv.lock ./
