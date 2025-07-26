@@ -1,24 +1,6 @@
-# Multi-stage Dockerfile for SvelteKit Frontend
+# Dockerfile for SvelteKit Frontend (Production)
+# Note: This expects the app to be pre-built locally with 'npm run build'
 
-# Build stage
-FROM node:20-alpine AS builder
-
-# Set working directory
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-
-# Install all dependencies (including dev dependencies for building)
-RUN npm ci
-
-# Copy source code
-COPY . .
-
-# Build the application
-RUN npm run build
-
-# Production stage  
 FROM node:20-alpine AS production
 
 # Set working directory
@@ -30,31 +12,31 @@ COPY package*.json ./
 # Install only production dependencies
 RUN npm ci --omit=dev && npm cache clean --force
 
-# Copy built application from builder stage
-COPY --from=builder /app/.svelte-kit/output .
+# Copy pre-built application output
+COPY .svelte-kit/output .
 
 # Copy health check script
 COPY healthcheck.js .
 
-# Create a non-root user
+# Create a non-root user for security
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S sveltekit -u 1001
 
-# Change ownership of the app directory
+# Change ownership of the app directory to the non-root user
 RUN chown -R sveltekit:nodejs /app
 USER sveltekit
 
-# Expose port
+# Expose the application port
 EXPOSE 3000
 
-# Set environment variables
+# Set environment variables for production
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOST=0.0.0.0
 
-# Health check
+# Add health check for container monitoring
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node healthcheck.js || exit 1
 
-# Start the application
+# Start the SvelteKit application
 CMD ["node", "server/index.js"]

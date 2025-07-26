@@ -2,10 +2,6 @@
 node_modules
 npm-debug.log*
 
-# Build output (will be built in the container)
-.svelte-kit
-build
-
 # Development files
 .env.local
 .env.development.local
