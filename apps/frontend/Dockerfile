@@ -1,7 +1,5 @@
-# Dockerfile for SvelteKit Frontend (Production)
-# Note: This expects the app to be pre-built locally with 'npm run build'
-
-FROM node:20-alpine AS production
+# Simple single-stage build for SvelteKit Frontend
+FROM node:20-alpine
 
 # Set working directory
 WORKDIR /app
@@ -9,25 +7,17 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install all dependencies (including dev dependencies for build)
-RUN npm ci && npm cache clean --force
+# Install all dependencies
+RUN npm ci --verbose
 
-# Build the application to generate .svelte-kit/output
+# Copy source code
+COPY . .
+
+# Build the application
 RUN npm run build
 
-# Copy built application output
-COPY .svelte-kit/output .
-
-# Copy health check script
-COPY healthcheck.js .
-
-# Create a non-root user for security
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S sveltekit -u 1001
-
-# Change ownership of the app directory to the non-root user
-RUN chown -R sveltekit:nodejs /app
-USER sveltekit
+# Copy health check script (if it doesn't exist, create a simple one)
+RUN echo 'const http = require("http"); const options = { hostname: "localhost", port: 3000, path: "/", method: "GET" }; const req = http.request(options, (res) => { process.exit(res.statusCode === 200 ? 0 : 1); }); req.on("error", () => { process.exit(1); }); req.end();' > healthcheck.js
 
 # Expose the application port
 EXPOSE 3000
@@ -38,8 +28,8 @@ ENV PORT=3000
 ENV HOST=0.0.0.0
 
 # Add health check for container monitoring
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
   CMD node healthcheck.js || exit 1
 
 # Start the SvelteKit application
-CMD ["node", "server/index.js"]
+CMD ["node", "build/index.js"]
