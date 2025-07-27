@@ -1,0 +1,89 @@
+services:
+  # Database
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "54322:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Supabase API Gateway (PostgREST)
+  supabase-rest:
+    image: postgrest/postgrest:v12.2.4
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    environment:
+      PGRST_DB_URI: postgres://postgres:postgres@db:5432/postgres
+      PGRST_DB_SCHEMAS: public
+      PGRST_DB_ANON_ROLE: postgres
+      PGRST_JWT_SECRET: your-super-secret-jwt-token-with-at-least-32-characters-long
+      PGRST_DB_USE_LEGACY_GUCS: false
+    ports:
+      - "54321:3000"
+
+  # Email testing (Inbucket)
+  supabase-inbucket:
+    image: inbucket/inbucket:stable
+    environment:
+      INBUCKET_WEB_ADDR: 0.0.0.0:9000
+      INBUCKET_POP3_ADDR: 0.0.0.0:9110
+      INBUCKET_SMTP_ADDR: 0.0.0.0:9025
+    ports:
+      - "54324:9000"
+      - "54325:9025"
+      - "54326:9110"
+
+  # Application Services
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    environment:
+      - SUPABASE_URL=http://supabase-rest:3000
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - supabase-rest
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Frontend Application
+  frontend:
+    build:
+      context: ./apps/frontend
+      dockerfile: Dockerfile
+    environment:
+      - PUBLIC_SUPABASE_URL=http://localhost:54321
+      - API_URL=http://api:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+networks:
+  default:
+    name: meal-mind-network
+
+volumes:
+  db_data:

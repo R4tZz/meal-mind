@@ -4,14 +4,11 @@ FROM python:3.12-slim
 # Set working directory
 WORKDIR /app
 
-# Install uv
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-
 # Copy project files
-COPY pyproject.toml uv.lock ./
+COPY pyproject.toml ./
 
-# Install dependencies using uv
-RUN uv sync --frozen
+# Install dependencies from pyproject.toml
+RUN pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org --no-cache-dir .
 
 # Copy application code
 COPY . .
@@ -20,4 +17,4 @@ COPY . .
 EXPOSE 8000
 
 # Run the FastAPI application using uvicorn
-CMD ["uv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
