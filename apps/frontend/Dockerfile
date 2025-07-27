@@ -9,10 +9,13 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install only production dependencies
-RUN npm ci --omit=dev && npm cache clean --force
+# Install all dependencies (including dev dependencies for build)
+RUN npm ci && npm cache clean --force
 
-# Copy pre-built application output
+# Build the application to generate .svelte-kit/output
+RUN npm run build
+
+# Copy built application output
 COPY .svelte-kit/output .
 
 # Copy health check script
