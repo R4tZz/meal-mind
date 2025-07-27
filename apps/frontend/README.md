@@ -1,38 +1,108 @@
-# sv
+# MealMind Frontend 🎨
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+The SvelteKit-based frontend application for MealMind, a household assistant that streamlines meal planning, grocery list generation, and shopping notifications.
 
-## Creating a project
+## Overview
 
-If you're seeing this, you've probably already done this step. Congrats!
+This frontend provides an intuitive user interface for:
+
+- **Recipe Management** - Browse, create, and organize recipes
+- **Meal Planning** - Plan weekly meals with drag-and-drop interface
+- **Grocery Lists** - View auto-generated shopping lists from planned meals
+- **Smart Notifications** - Receive timely reminders for grocery shopping
+
+## Technology Stack
+
+- **SvelteKit** - Modern web framework with SSR support
+- **TypeScript** - Type-safe development
+- **Tailwind CSS** - Utility-first styling
+- **shadcn/svelte** - Beautiful UI components
+- **Docker** - Containerized deployment
+
+## Development
+
+### Prerequisites
+
+- Node.js 20+ (for local development)
+- Docker Desktop (for containerized deployment)
+
+### Local Development
 
 ```bash
-# create a new project in the current directory
-npx sv create
+# Install dependencies
+npm install
 
-# create a new project in my-app
-npx sv create my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
+# Start development server
 npm run dev
 
-# or start the server and open the app in a new browser tab
+# Open in browser
 npm run dev -- --open
 ```
 
-## Building
+The development server runs at `http://localhost:5173` with hot module replacement.
 
-To create a production version of your app:
+### Building
 
 ```bash
+# Build for production
 npm run build
+
+# Preview production build
+npm run preview
 ```
 
-You can preview the production build with `npm run preview`.
+## Docker Deployment
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+This application is containerized with a multi-stage Docker build optimized for production:
+
+```bash
+# Build Docker image
+docker build -t meal-mind-frontend .
+
+# Run container
+docker run -p 3000:3000 meal-mind-frontend
+```
+
+The containerized app runs at `http://localhost:3000` with server-side rendering enabled.
+
+### Docker Features
+
+- **Multi-stage build** - Optimized production image
+- **Non-root user** - Enhanced security
+- **Health checks** - Container monitoring
+- **Alpine Linux** - Minimal attack surface
+
+## Integration
+
+This frontend communicates with:
+
+- **Backend API** - FastAPI service at `http://localhost:8000`
+- **Supabase** - Authentication and real-time data
+- **Docker Compose** - Orchestrated with other services
+
+## Testing
+
+```bash
+# Run unit tests
+npm run test
+
+# Run E2E tests
+npm run test:e2e
+
+# Type checking
+npm run check
+```
+
+## Architecture
+
+The frontend follows SvelteKit conventions with:
+
+```
+src/
+├── routes/           # Page components and API routes
+├── lib/             # Reusable components and utilities
+├── app.html         # HTML template
+└── app.css          # Global styles with Tailwind
+```
+
+Built for production deployment with `@sveltejs/adapter-node` for Node.js server environments.
