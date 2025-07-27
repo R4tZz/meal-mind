@@ -66,21 +66,20 @@ services:
       timeout: 10s
       retries: 5
 
-  # Note: Frontend service commented out until Dockerfile build issues are resolved
-  # Uncomment and fix when ready to include frontend
-  # frontend:
-  #   build:
-  #     context: ./apps/frontend
-  #     dockerfile: Dockerfile
-  #   environment:
-  #     - PUBLIC_SUPABASE_URL=http://localhost:54321
-  #     - API_URL=http://api:8000
-  #   ports:
-  #     - "3000:3000"
-  #   depends_on:
-  #     api:
-  #       condition: service_healthy
-  #   restart: unless-stopped
+  # Frontend Application
+  frontend:
+    build:
+      context: ./apps/frontend
+      dockerfile: Dockerfile
+    environment:
+      - PUBLIC_SUPABASE_URL=http://localhost:54321
+      - API_URL=http://api:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
 
 networks:
   default:

@@ -7,14 +7,15 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install all dependencies
-RUN npm ci --verbose
+# Install all dependencies (including devDependencies needed for build)
+ENV NODE_ENV=development
+RUN npm install --verbose
 
 # Copy source code
 COPY . .
 
-# Build the application
-RUN npm run build
+# Build the application (use full path to avoid PATH issues)
+RUN /app/node_modules/.bin/vite build
 
 # Copy health check script (if it doesn't exist, create a simple one)
 RUN echo 'const http = require("http"); const options = { hostname: "localhost", port: 3000, path: "/", method: "GET" }; const req = http.request(options, (res) => { process.exit(res.statusCode === 200 ? 0 : 1); }); req.on("error", () => { process.exit(1); }); req.end();' > healthcheck.js
