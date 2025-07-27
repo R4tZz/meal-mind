@@ -1,5 +1,5 @@
 // Simple health check for the SvelteKit application
-const http = require('http');
+import http from 'node:http';
 
 const options = {
   hostname: 'localhost',
