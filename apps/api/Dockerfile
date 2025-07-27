@@ -7,8 +7,8 @@ WORKDIR /app
 # Copy project files
 COPY pyproject.toml ./
 
-# Install dependencies with trusted host
-RUN pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org --no-cache-dir fastapi uvicorn
+# Install dependencies from pyproject.toml
+RUN pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org --no-cache-dir .
 
 # Copy application code
 COPY . .
