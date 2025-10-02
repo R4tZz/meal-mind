@@ -46,3 +46,7 @@ Thumbs.db
 # Supabase
 supabase/.temp
 supabase/.env
+
+# API
+apps/api/.venv
+apps/api/.pytest_cache
