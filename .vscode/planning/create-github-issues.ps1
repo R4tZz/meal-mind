@@ -1,4 +1,7 @@
 param(
+    [Parameter(Mandatory=$true)]
+    [string]$CsvFile,
+    
     [switch]$DryRun = $false
 )
 
@@ -11,11 +14,17 @@ function Ensure-Labels {
     # Define colors for different label types
     $labelColors = @{
         'phase-1' = '#0075ca'      # Blue
+        'phase-2' = '#1d76db'      # Darker Blue
+        'phase-3' = '#0e8a16'      # Green
+        'phase-4' = '#fbca04'      # Yellow
+        'phase-5' = '#d93f0b'      # Orange
+        'phase-6' = '#b60205'      # Dark Red
         'setup' = '#7057ff'        # Purple  
         'backend' = '#d73a4a'      # Red
         'frontend' = '#a2eeef'     # Light blue
         'docker' = '#0052cc'       # Dark blue
         'supabase' = '#00d084'     # Green
+        'database' = '#fbca04'     # Yellow-orange
         'python' = '#ffd33d'       # Yellow
         'testing' = '#f85149'      # Light red
     }
@@ -51,15 +60,22 @@ function Ensure-Labels {
     }
 }
 
+# Validate CSV file exists
+if (-not (Test-Path $CsvFile)) {
+    Write-Host "❌ Error: CSV file not found: $CsvFile" -ForegroundColor Red
+    exit 1
+}
+
 # Read the CSV file and parse manually due to non-standard multi-line format
-$csvPath = "d:\Workspace\meal-mind\.vscode\planning.md\phase1-issues.csv"
-$content = Get-Content $csvPath -Raw
+$content = Get-Content $CsvFile -Raw
 
 if ($DryRun) {
     Write-Host "🔍 DRY RUN MODE - Commands will be displayed but not executed" -ForegroundColor Yellow
+    Write-Host "📄 CSV File: $CsvFile" -ForegroundColor Yellow
     Write-Host ""
 } else {
     Write-Host "🚀 LIVE MODE - Issues will be created on GitHub" -ForegroundColor Green
+    Write-Host "📄 CSV File: $CsvFile" -ForegroundColor Green
     Write-Host ""
 }
 
@@ -107,6 +123,7 @@ if ($DryRun) {
     Write-Host "🎫 Creating issues..." -ForegroundColor Magenta
 }
 
+$issueCount = 0
 foreach ($record in $records) {
     $lines = $record -split "`r?`n" | Where-Object { $_.Trim() -ne "" }
     
@@ -153,6 +170,7 @@ foreach ($record in $records) {
                     $result = Invoke-Expression $command 2>&1
                     if ($LASTEXITCODE -eq 0) {
                         Write-Host "✅ Successfully created issue: $title" -ForegroundColor Green
+                        $issueCount++
                     } else {
                         Write-Host "❌ Failed to create issue: $title" -ForegroundColor Red
                         Write-Host "Error output: $result" -ForegroundColor Red
@@ -179,3 +197,10 @@ foreach ($record in $records) {
     }
 }
 
+# Summary
+if (-not $DryRun -and $issueCount -gt 0) {
+    Write-Host ""
+    Write-Host "========================================" -ForegroundColor Green
+    Write-Host "✅ Successfully created $issueCount issue(s)" -ForegroundColor Green
+    Write-Host "========================================" -ForegroundColor Green
+}

@@ -1,0 +1,100 @@
+title,body,labels,status
+"Implement Database Schema with Alembic",
+"Create the database schema for recipes, ingredients, and meal plans using alembic migrations.
+- **Acceptance Criteria:**
+  - Database tables for **recipes**, **ingredients**, and **meal_plans** are defined.
+  - **alembic** is installed and configured in the backend project.
+  - Initial migration scripts are created and can be applied successfully.
+  - Migration applies correctly to the local Supabase PostgreSQL database.
+  - SQLAlchemy ORM models are created for each table.
+  - Unit tests confirm that migrations apply without errors.",
+"phase-2,backend,database",Backlog
+
+"Create Recipe Model and Validation",
+"Implement Pydantic models for recipe data validation and SQLAlchemy models for database operations.
+- **Acceptance Criteria:**
+  - Pydantic models for recipe creation, updates, and responses are defined.
+  - SQLAlchemy ORM model for Recipe table is implemented.
+  - Models support ingredient relationships (one recipe has many ingredients).
+  - Unit tests verify model validation logic.
+  - Models are documented with clear field descriptions.",
+"phase-2,backend",Backlog
+
+"Implement Recipe CRUD Endpoints",
+"Create FastAPI endpoints for creating, reading, updating, and deleting recipes.
+- **Acceptance Criteria:**
+  - **POST /recipes** endpoint creates a new recipe with ingredients.
+  - **GET /recipes** endpoint retrieves all recipes.
+  - **GET /recipes/{id}** endpoint retrieves a single recipe by ID.
+  - **PUT /recipes/{id}** endpoint updates an existing recipe.
+  - **DELETE /recipes/{id}** endpoint deletes a recipe.
+  - All endpoints return appropriate status codes (200, 201, 404, 400).
+  - API tests verify all CRUD operations using **pytest**.
+  - Tests confirm correct data persistence in PostgreSQL.
+  - Error handling is tested (invalid data, non-existent IDs).",
+"phase-2,backend",Backlog
+
+"Implement Meal Plan Model and Validation",
+"Create Pydantic and SQLAlchemy models for meal planning functionality.
+- **Acceptance Criteria:**
+  - Pydantic models for meal plan creation and responses are defined.
+  - SQLAlchemy ORM model for MealPlan table is implemented.
+  - Models link recipes to specific dates and meal types (breakfast, lunch, dinner).
+  - Unit tests verify model validation and relationships.
+  - Support for querying meals by date range.",
+"phase-2,backend",Backlog
+
+"Implement Meal Planning Endpoints",
+"Create FastAPI endpoints for managing meal plans (adding, retrieving, updating, removing).
+- **Acceptance Criteria:**
+  - **POST /meal-plans** endpoint assigns a recipe to a specific date and meal type.
+  - **GET /meal-plans** endpoint retrieves meal plans (with optional date range filtering).
+  - **PUT /meal-plans/{id}** endpoint updates a planned meal.
+  - **DELETE /meal-plans/{id}** endpoint removes a planned meal.
+  - All endpoints return appropriate status codes.
+  - API tests verify all meal planning operations using **pytest**.
+  - Tests confirm recipes are correctly linked to meal plans.
+  - Query parameters for filtering by date range are tested.",
+"phase-2,backend",Backlog
+
+"Implement Grocery List Aggregation Logic",
+"Create the core business logic to aggregate ingredients from planned meals and sum quantities.
+- **Acceptance Criteria:**
+  - A service/utility function aggregates ingredients from all meals in a given date range.
+  - Ingredients with the same name are consolidated and quantities are summed.
+  - Unit handling is consistent (e.g., '2 cups' + '1 cup' = '3 cups').
+  - Unit tests verify aggregation logic with various scenarios.
+  - Edge cases are handled (empty meal plans, missing ingredients).",
+"phase-2,backend",Backlog
+
+"Implement Grocery List Endpoint",
+"Create a FastAPI endpoint to expose the consolidated grocery list.
+- **Acceptance Criteria:**
+  - **GET /grocery-list** endpoint returns aggregated ingredients.
+  - Endpoint accepts optional date range parameters (default: current week).
+  - Response includes ingredient names, quantities, and units.
+  - API tests verify correct aggregation from multiple recipes.
+  - Tests confirm proper date range filtering.
+  - Empty grocery lists are handled gracefully.",
+"phase-2,backend",Backlog
+
+"Configure CORS for FastAPI",
+"Set up CORS middleware in FastAPI to allow frontend communication.
+- **Acceptance Criteria:**
+  - CORS middleware is properly configured in FastAPI app.
+  - Allowed origins include the frontend development URL (e.g., http://localhost:5173).
+  - CORS configuration supports necessary HTTP methods (GET, POST, PUT, DELETE).
+  - CORS headers are correctly returned in API responses.
+  - Manual testing or basic test confirms frontend can make requests to backend.",
+"phase-2,backend",Backlog
+
+"Write Comprehensive Backend Tests",
+"Ensure all Phase 2 backend features have complete test coverage.
+- **Acceptance Criteria:**
+  - All API endpoints have integration tests using **pytest**.
+  - Database interactions are tested with test fixtures or a test database.
+  - Unit tests cover business logic, models, and utility functions.
+  - Tests verify error handling and edge cases.
+  - Test suite runs successfully with **nx test api** or equivalent command.
+  - All tests pass consistently and can be run in CI/CD pipeline.",
+"phase-2,backend,testing",Backlog

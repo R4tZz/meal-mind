@@ -18,7 +18,7 @@ MealMind helps busy households by:
 - **FastAPI** (Python) - High-performance web framework
 - **PostgreSQL** - Robust database via Supabase
 - **uv** - Modern Python package manager
-- **pytest** + **httpx** - Comprehensive testing
+- **pytest** - Comprehensive testing
 
 ### Frontend
 
@@ -29,33 +29,47 @@ MealMind helps busy households by:
 
 ### Infrastructure
 
-- **Docker** + **Docker Compose** - Containerization
-- **Nx** - Monorepo management
+- **Docker** + **Docker Compose** - Containerization and orchestration
+- **Nx** - Monorepo management and build system
 - **GitHub Actions** - CI/CD pipeline
-- **Supabase** - Database and authentication
+- **PostgreSQL 15** - Production-grade database
+- **PostgREST** - Auto-generated REST API from database schema
+- **Inbucket** - Email testing and debugging
 
 ## 🏗️ Architecture
 
 ```
-User Browser ↔ SvelteKit Frontend Container ↔ FastAPI Backend Container ↔ Supabase PostgreSQL
+User Browser ↔ SvelteKit Frontend (Port 3000) ↔ FastAPI Backend (Port 8000) ↔ PostgreSQL (Port 54322)
+                                                          ↓
+                                                  PostgREST (Port 54321)
 ```
 
-The application runs as a containerized microservices architecture with:
+The application runs as a containerized microservices architecture:
 
-- Frontend and backend as separate Docker containers
-- Local Supabase stack for development
-- All services orchestrated via Docker Compose within an Nx monorepo
+- **Frontend Container**: SvelteKit app serving the user interface
+- **Backend Container**: FastAPI handling business logic and API endpoints
+- **Database Container**: PostgreSQL 15 for data persistence
+- **PostgREST Container**: Auto-generated REST API from database schema
+- **Email Container**: Inbucket for email testing in development
+- **Network**: All services communicate through `meal-mind-network`
+
+### Current API Endpoints
+
+- `GET /` - Welcome message
+- `GET /health` - Health check endpoint
+- `GET /db-test` - Database connection verification
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-- **Docker Desktop** - Container runtime
-- **Node.js** (LTS) - JavaScript runtime
-- **Python** (3.9+) - Backend runtime
-- **uv** - Python package manager
+- **Docker Desktop** - Container runtime (required)
+- **Node.js** (v20+) - For local development (optional)
+- **Python** (3.12+) - For local development (optional)
 
-### Installation
+### Quick Start with Docker
+
+The easiest way to get started is using Docker Compose, which will set up all services automatically:
 
 1. **Clone the repository**
 
@@ -64,31 +78,94 @@ The application runs as a containerized microservices architecture with:
    cd meal-mind
    ```
 
-2. **Install dependencies**
-
-   ```bash
-   npm install
-   ```
-
-3. **Initialize Supabase**
-
-   ```bash
-   npx supabase init
-   npx supabase start
-   ```
-
-4. **Start the development environment**
+2. **Start all services**
 
    ```bash
    docker compose up -d
    ```
 
-5. **Access the application**
-   - Frontend: `http://localhost:3000`
-   - Backend API: `http://localhost:8000`
-   - Supabase Studio: `http://localhost:54323`
+   This will start:
+   - PostgreSQL database (port 54322)
+   - FastAPI backend (port 8000)
+   - SvelteKit frontend (port 3000)
+   - Supabase REST API/PostgREST (port 54321)
+   - Email testing service/Inbucket (port 54324)
 
-## 📋 Development Workflow
+3. **Verify everything is running**
+
+   ```bash
+   docker compose ps
+   ```
+
+4. **Access the application**
+   - **Frontend**: http://localhost:3000
+   - **Backend API**: http://localhost:8000
+   - **API Health Check**: http://localhost:8000/health
+   - **Database Test**: http://localhost:8000/db-test
+   - **Supabase REST**: http://localhost:54321
+   - **Email Testing UI**: http://localhost:54324
+
+### Stopping Services
+
+```bash
+# Stop all containers
+docker compose down
+
+# Stop and remove volumes (clean slate)
+docker compose down -v
+```
+
+### Viewing Logs
+
+```bash
+# All services
+docker compose logs
+
+# Specific service
+docker compose logs api
+docker compose logs frontend
+docker compose logs db
+
+# Follow logs in real-time
+docker compose logs -f api
+```
+
+## � Docker Services
+
+The application uses Docker Compose to orchestrate multiple services:
+
+| Service | Port | Description | Status |
+|---------|------|-------------|--------|
+| **frontend** | 3000 | SvelteKit web application | ✅ Running |
+| **api** | 8000 | FastAPI backend service | ✅ Running |
+| **db** | 54322 | PostgreSQL 15 database | ✅ Running |
+| **supabase-rest** | 54321 | PostgREST API gateway | ✅ Running |
+| **supabase-inbucket** | 54324 | Email testing UI | ✅ Running |
+
+### Service Health
+
+All services include health checks to ensure proper startup:
+- **Database**: Checks PostgreSQL readiness
+- **API**: Monitors `/health` endpoint
+- **Frontend**: Verifies application response
+
+### Environment Variables
+
+**API Container:**
+```env
+SUPABASE_URL=http://supabase-rest:3000
+DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
+```
+
+**Frontend Container:**
+```env
+PUBLIC_SUPABASE_URL=http://localhost:54321
+API_URL=http://api:8000
+```
+
+For more details, see [DOCKER_SETUP.md](DOCKER_SETUP.md)
+
+## �📋 Development Workflow
 
 This project follows **Scrum methodology** with GitHub Projects:
 
@@ -116,9 +193,13 @@ This project follows **Scrum methodology** with GitHub Projects:
 **Status: In Progress**
 
 - [x] Nx monorepo setup
-- [x] Docker containerization
-- [x] Local Supabase stack
-- [ ] Testing infrastructure
+- [x] Docker containerization (API, Frontend, Database)
+- [x] PostgreSQL database with health checks
+- [x] FastAPI backend with basic endpoints
+- [x] SvelteKit frontend with communication tests
+- [x] Container networking and orchestration
+- [ ] Testing infrastructure setup
+- [ ] Initial test runners for frontend and backend
 
 ### Phase 2: Backend Development 🔧
 
@@ -167,7 +248,7 @@ This project follows **Scrum methodology** with GitHub Projects:
 ### Backend Testing
 
 - **Unit Tests**: `pytest` for individual functions and models
-- **API Tests**: `httpx` for endpoint testing
+- **API Tests**: `pytest` for endpoint testing
 - **Integration Tests**: Database interaction verification
 
 ### Frontend Testing
@@ -199,7 +280,19 @@ This project follows **Scrum methodology** with GitHub Projects:
 ### Development Commands
 
 ```bash
-# Run tests
+# Docker commands
+docker compose up -d          # Start all services
+docker compose down           # Stop all services
+docker compose ps             # Check service status
+docker compose logs [service] # View logs
+docker compose restart [service] # Restart a service
+
+# Rebuild after code changes
+docker compose up -d --build api       # Rebuild API only
+docker compose up -d --build frontend  # Rebuild frontend only
+docker compose up -d --build           # Rebuild all
+
+# Run tests (when test infrastructure is set up)
 nx test frontend
 nx test api
 
@@ -210,13 +303,71 @@ nx build api
 # Lint code
 nx lint frontend
 nx lint api
-
-# Start development servers
-nx serve frontend
-nx serve api
 ```
 
-## 📝 License
+### Database Access
+
+```bash
+# Connect to PostgreSQL directly
+docker compose exec db psql -U postgres
+
+# Run SQL commands
+docker compose exec db psql -U postgres -c "SELECT version();"
+```
+
+## � Troubleshooting
+
+### Container Issues
+
+**Containers won't start:**
+```bash
+# Check Docker is running
+docker --version
+
+# Remove old containers and volumes
+docker compose down -v
+
+# Rebuild from scratch
+docker compose build --no-cache
+docker compose up -d
+```
+
+**Port conflicts:**
+If you see port binding errors, check if ports are already in use:
+- Frontend: 3000
+- API: 8000
+- Database: 54322
+- PostgREST: 54321
+- Inbucket: 54324, 54325, 54326
+
+**View detailed logs:**
+```bash
+docker compose logs --tail=100 [service-name]
+```
+
+### Database Connection Issues
+
+```bash
+# Verify database is healthy
+docker compose ps db
+
+# Check database logs
+docker compose logs db
+
+# Test connection manually
+docker compose exec db psql -U postgres -c "SELECT 1;"
+```
+
+### Frontend/Backend Communication Issues
+
+1. Visit http://localhost:3000 to see the communication test page
+2. Check that all status indicators show as healthy
+3. Verify containers are on the same network:
+   ```bash
+   docker network inspect meal-mind-network
+   ```
+
+## �📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 

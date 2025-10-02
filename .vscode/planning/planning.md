@@ -13,7 +13,7 @@
 - **Styling:** Tailwind CSS
 - **UI Components:** `shadcn/svelte`
 - **Email Notifications:** Python `smtplib` with Gmail App Passwords
-- **Testing - Backend:** `pytest` (Unit, API, Database Integration) + `httpx` (API Client)
+- **Testing - Backend:** `pytest` (Unit, API, Database Integration)
 - **Testing - Frontend:** `Vitest` (Unit) + `Playwright` (E2E with Page Object Model)
 - **CI/CD:** GitHub Actions
 
@@ -83,7 +83,7 @@ To simulate a corporate environment with Scrum, we will use GitHub Projects as o
     - A `pyproject.toml` and `uv.lock` file are generated for the FastAPI project to define and lock dependencies using `uv`.
     - The FastAPI application is configured to connect to the local Supabase PostgreSQL container using environment variables.
     - The backend container can be built (`docker build`) and run locally.
-    - **Testing Tools Setup (Backend):** `pytest` and `httpx` are installed as dev dependencies for the backend project, and a minimal `pytest` configuration (e.g., `pytest.ini`) is present.
+    - **Testing Tools Setup (Backend):** `pytest` is installed as a dev dependency for the backend project, and a minimal `pytest` configuration (e.g., `pytest.ini`) is present.
 5.  **Frontend Application Dockerization (SvelteKit):**
     - A `Dockerfile` is created for the SvelteKit application within its Nx project directory (e.g., `apps/frontend/Dockerfile`).
     - The `Dockerfile` uses a Node.js base image and is set up for a multi-stage build.
@@ -130,7 +130,7 @@ To simulate a corporate environment with Scrum, we will use GitHub Projects as o
 
 - **Code is Written:** All required API endpoints and business logic are implemented.
 - **Backend Unit Tests:** Unit tests for individual functions, models, and utility modules are written and pass.
-- **Backend API/Integration Tests:** API tests covering all implemented endpoints are written using `pytest` and `httpx`. These tests verify:
+- **Backend API/Integration Tests:** API tests covering all implemented endpoints are written using `pytest`. These tests verify:
   - Correct status codes (200 OK, 201 Created, 400 Bad Request, 404 Not Found, etc.).
   - Accurate request/response body structures (using Pydantic models).
   - Correct data persistence and retrieval from the PostgreSQL database (using test fixtures that manage transaction rollbacks or a dedicated test database).

@@ -52,9 +52,9 @@ title,body,labels,status
 "phase-1,python",Backlog
 
 "Install Testing Tools (Backend)",
-"Install **pytest** and **httpx** as development dependencies for the backend project.
+"Install **pytest** as a development dependency for the backend project.
 - **Acceptance Criteria:**
-  - **pytest** and **httpx** are installed as dev dependencies for the backend project.
+  - **pytest** is installed as a dev dependency for the backend project.
   - A minimal **pytest** configuration (e.g., **pytest.ini**) is present.",
 "phase-1,testing",Backlog
 
