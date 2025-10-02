@@ -50,3 +50,4 @@ supabase/.env
 # API
 apps/api/.venv
 apps/api/.pytest_cache
+apps/api/__pycache__
