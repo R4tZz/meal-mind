@@ -29,7 +29,7 @@ services:
       PGRST_DB_URI: postgres://postgres:postgres@db:5432/postgres
       PGRST_DB_SCHEMAS: public
       PGRST_DB_ANON_ROLE: postgres
-      PGRST_JWT_SECRET: your-super-secret-jwt-token-with-at-least-32-characters-long
+      PGRST_JWT_SECRET: ${PGRST_JWT_SECRET}
       PGRST_DB_USE_LEGACY_GUCS: false
     ports:
       - "54321:3000"
@@ -46,6 +46,42 @@ services:
       - "54325:9025"
       - "54326:9110"
 
+  # Supabase Postgres Meta (Database metadata API for Studio)
+  supabase-meta:
+    image: supabase/postgres-meta:v0.75.0
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    environment:
+      PG_META_PORT: 8080
+      PG_META_DB_HOST: db
+      PG_META_DB_PORT: 5432
+      PG_META_DB_NAME: postgres
+      PG_META_DB_USER: postgres
+      PG_META_DB_PASSWORD: postgres
+
+  # Supabase Studio (Database Management UI)
+  supabase-studio:
+    image: supabase/studio:20231123-64a766a
+    depends_on:
+      db:
+        condition: service_healthy
+      supabase-meta:
+        condition: service_started
+    restart: unless-stopped
+    environment:
+      STUDIO_PG_META_URL: http://supabase-meta:8080
+      POSTGRES_PASSWORD: postgres
+      DEFAULT_ORGANIZATION_NAME: MealMind
+      DEFAULT_PROJECT_NAME: MealMind Local
+      SUPABASE_URL: http://supabase-rest:3000
+      SUPABASE_PUBLIC_URL: http://localhost:54321
+      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
+      SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_KEY}
+    ports:
+      - "54323:3000"
+
   # Application Services
   api:
     build:
@@ -61,7 +97,13 @@ services:
       - supabase-rest
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')",
+        ]
       interval: 30s
       timeout: 10s
       retries: 5
